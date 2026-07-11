@@ -28,6 +28,15 @@ Grab the latest installer from the **[Releases page](https://github.com/christop
 
 A frosted-glass, dark-themed interface: a list of saved servers, a big color-coded connection state, and — once connected — your overlay IP shown large and copyable, ready to paste into your game's LAN IP field.
 
+<table>
+<tr>
+<td align="center" width="25%"><img src="docs/screenshot-server-list.png" alt="Server list, empty state"><br><sub>Your servers</sub></td>
+<td align="center" width="25%"><img src="docs/screenshot-add-server.png" alt="Adding a server via invite code"><br><sub>Add via invite code</sub></td>
+<td align="center" width="25%"><img src="docs/screenshot-connecting.png" alt="Connecting state, with the rotating globe spinner"><br><sub>Connecting…</sub></td>
+<td align="center" width="25%"><img src="docs/screenshot-connected.png" alt="Connected state, showing the overlay IP"><br><sub>Connected</sub></td>
+</tr>
+</table>
+
 ## How to use it
 
 **Joining a friend's network:**
@@ -41,6 +50,10 @@ A frosted-glass, dark-themed interface: a list of saved servers, a big color-cod
 2. In Village, go to the small **Advanced** link at the bottom of the server list.
 3. Fill in a nickname, a community name, an encryption key, and your supernode's `host:port`.
 4. Click **Generate Invite Code** and send the resulting string to your friends. Optionally also **Save as My Server** so you can connect yourself.
+
+<img src="docs/screenshot-advanced.png" alt="Advanced screen for creating an invite code from raw connection details" width="360">
+
+*This screen is host-only — most people never see it. If someone sent you a code, you just need "+ Add server" on the home screen.*
 
 Multiple servers are supported side by side — e.g. one for friends in the EU, one for friends in Asia — pick which one to connect to from the list.
 
