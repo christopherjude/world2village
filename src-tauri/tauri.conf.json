@@ -14,7 +14,8 @@
         "title": "Village",
         "width": 480,
         "height": 640,
-        "resizable": true
+        "resizable": false,
+        "maximizable": false
       }
     ]
   },

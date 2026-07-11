@@ -1,30 +1,35 @@
-/* Village -- simple, modern, non-Win32-dialog look. Single stylesheet,
-   no framework. See CLAUDE.md's product decisions for the "why" behind
-   the big connection state, large copyable IP, and de-emphasized
-   Advanced/host screen. */
+/* Village -- "Liquid Glass" look: translucent frosted panels over a soft
+   ambient color field, per Apple's macOS Tahoe design language. Single
+   stylesheet, no framework. See CLAUDE.md's product decisions for the "why"
+   behind the big connection state, large copyable IP, and de-emphasized
+   Advanced/host screen -- this pass only changes how those are dressed. */
 
 :root {
-  --color-bg: #14171c;
-  --color-surface: #1c2027;
-  --color-surface-raised: #232833;
-  --color-border: #2c313c;
-  --color-text: #e8eaed;
-  --color-text-muted: #9aa2b1;
-  --color-text-faint: #6b7280;
-  --color-accent: #4f8cff;
-  --color-accent-hover: #6ba0ff;
+  --color-bg: #0b0d12;
+  --color-text: #f1f3f7;
+  --color-text-muted: #a9b1c2;
+  --color-text-faint: #75809a;
 
-  --color-connected: #2fbf71;
-  --color-connected-bg: rgba(47, 191, 113, 0.12);
-  --color-connecting: #e0a72f;
-  --color-connecting-bg: rgba(224, 167, 47, 0.12);
-  --color-error: #e5484d;
-  --color-error-bg: rgba(229, 72, 77, 0.12);
-  --color-idle: #6b7280;
-  --color-idle-bg: rgba(107, 114, 128, 0.12);
+  --color-accent: #6d8cff;
+  --color-accent-hover: #89a3ff;
 
-  --radius: 10px;
-  --radius-sm: 6px;
+  --color-connected: #34e29d;
+  --color-connecting: #ffc95c;
+  --color-error: #ff6b6f;
+  --color-idle: #8892a6;
+
+  /* Glass surface tokens: translucent fills + a bright top-edge highlight
+     to fake a specular reflection, over `backdrop-filter: blur(...)`. */
+  --glass-blur: 28px;
+  --glass-fill: rgba(255, 255, 255, 0.07);
+  --glass-fill-raised: rgba(255, 255, 255, 0.11);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
 }
 
 * {
@@ -38,46 +43,168 @@ body {
 
 body {
   margin: 0;
-  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, "Segoe UI", BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ---------- Ambient background: soft color blobs the glass panels
+   refract via backdrop-filter. Slow, subtle drift -- "liquid," not
+   distracting during actual use. ---------- */
+
+.bg-blobs {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.blob-1 {
+  width: 380px;
+  height: 380px;
+  top: -120px;
+  left: -80px;
+  background: radial-gradient(circle at 30% 30%, #6d8cff, transparent 70%);
+  animation: drift-1 26s ease-in-out infinite;
+}
+
+.blob-2 {
+  width: 320px;
+  height: 320px;
+  bottom: -100px;
+  right: -60px;
+  background: radial-gradient(circle at 60% 40%, #34e29d, transparent 70%);
+  animation: drift-2 32s ease-in-out infinite;
+}
+
+.blob-3 {
+  width: 260px;
+  height: 260px;
+  bottom: 20%;
+  left: 20%;
+  background: radial-gradient(circle at 50% 50%, #ff8fd6, transparent 70%);
+  animation: drift-3 22s ease-in-out infinite;
+}
+
+@keyframes drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 30px) scale(1.08); }
+}
+
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, -40px) scale(1.1); }
+}
+
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(24px, -24px) scale(0.94); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none !important;
+  }
+}
+
+/* ---------- Shared glass-panel treatment ---------- */
+
+.glass-panel {
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
 }
 
 /* ---------- Header ---------- */
 
+@font-face {
+  font-family: "Orbitron";
+  font-weight: 700;
+  font-style: normal;
+  src: url("fonts/Orbitron-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Orbitron";
+  font-weight: 900;
+  font-style: normal;
+  src: url("fonts/Orbitron-Black.ttf") format("truetype");
+  font-display: swap;
+}
+
 .app-header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--color-border);
+  justify-content: center;
+  padding: 22px 20px 24px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+/* `#nav-back` is pulled out of flow so `.brand` can be truly centered
+   regardless of whether the back link is shown. */
+#nav-back {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.2px;
+  justify-content: center;
+  width: 70%;
+  margin: 0 auto;
 }
 
-.brand-mark {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  display: inline-block;
+/* TRON-esque, etched-into-the-glass brand title: a geometric display font
+   (Orbitron, self-hosted -- see ui/fonts/), big and centered, with the
+   same engraved treatment as before (near-transparent fill + a dark
+   groove shadow above / light catch below). */
+.brand-name {
+  font-family: "Orbitron", "Segoe UI", sans-serif;
+  font-weight: 900;
+  font-size: 34px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.06);
+  text-shadow:
+    0 -1.5px 1px rgba(0, 0, 0, 0.65),
+    0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 /* ---------- Main / view root ---------- */
 
 main#view-root {
+  position: relative;
+  z-index: 1;
   flex: 1;
-  padding: 20px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -87,6 +214,18 @@ main#view-root {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  animation: view-in 0.25s ease-out;
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .view[hidden] {
@@ -94,7 +233,9 @@ main#view-root {
 }
 
 h1 {
-  font-size: 18px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
   margin: 0;
 }
 
@@ -116,46 +257,55 @@ button {
   font-family: inherit;
   font-size: 14px;
   cursor: pointer;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
-  padding: 8px 14px;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  padding: 9px 18px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
 .primary-button {
-  background: var(--color-accent);
+  background: linear-gradient(180deg, var(--color-accent-hover), var(--color-accent));
   color: #0b0e13;
   font-weight: 600;
   border: none;
+  box-shadow: 0 4px 16px rgba(109, 140, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .primary-button:hover:not(:disabled) {
-  background: var(--color-accent-hover);
+  box-shadow: 0 6px 20px rgba(109, 140, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .secondary-button {
-  background: transparent;
-  border: 1px solid var(--color-border);
+  background: var(--glass-fill-raised);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
   color: var(--color-text);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
 }
 
 .secondary-button:hover:not(:disabled) {
   border-color: var(--color-accent);
+  background: rgba(109, 140, 255, 0.14);
 }
 
 .danger-button {
-  background: transparent;
+  background: rgba(255, 107, 111, 0.12);
   border: 1px solid var(--color-error);
   color: var(--color-error);
 }
 
 .danger-button:hover:not(:disabled) {
-  background: var(--color-error-bg);
+  background: rgba(255, 107, 111, 0.22);
 }
 
 .icon-button {
@@ -165,10 +315,12 @@ button:disabled {
   padding: 4px 8px;
   font-size: 16px;
   line-height: 1;
+  border-radius: var(--radius-sm);
 }
 
 .icon-button:hover:not(:disabled) {
   color: var(--color-error);
+  background: rgba(255, 107, 111, 0.12);
 }
 
 .link-button {
@@ -177,6 +329,7 @@ button:disabled {
   color: var(--color-accent);
   padding: 0;
   font-size: 13px;
+  border-radius: 0;
 }
 
 .link-button:hover:not(:disabled) {
@@ -198,10 +351,19 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  padding: 14px 16px;
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
-  padding: 12px 14px;
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.server-row:hover {
+  background: var(--glass-fill-raised);
+  transform: translateY(-1px);
 }
 
 .server-row-main {
@@ -222,12 +384,12 @@ button:disabled {
 
 .status-dot.is-connected {
   background: var(--color-connected);
-  box-shadow: 0 0 0 3px var(--color-connected-bg);
+  box-shadow: 0 0 0 4px rgba(52, 226, 157, 0.2), 0 0 10px rgba(52, 226, 157, 0.7);
 }
 
 .status-dot.is-connecting {
   background: var(--color-connecting);
-  box-shadow: 0 0 0 3px var(--color-connecting-bg);
+  box-shadow: 0 0 0 4px rgba(255, 201, 92, 0.2), 0 0 10px rgba(255, 201, 92, 0.7);
 }
 
 .server-nickname {
@@ -239,6 +401,7 @@ button:disabled {
 
 .server-row-main.clickable {
   cursor: pointer;
+  border-radius: var(--radius-sm);
 }
 
 .server-row-main.clickable:hover {
@@ -247,7 +410,7 @@ button:disabled {
 
 .server-row-main.clickable:focus-visible {
   outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
@@ -260,9 +423,10 @@ button:disabled {
 
 .empty-state {
   text-align: center;
-  padding: 40px 16px;
+  padding: 44px 16px;
   color: var(--color-text-faint);
-  border: 1px dashed var(--color-border);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--glass-border);
   border-radius: var(--radius);
 }
 
@@ -270,36 +434,39 @@ button:disabled {
 
 .status-panel {
   border-radius: var(--radius);
-  padding: 28px 20px;
+  padding: 36px 24px;
   text-align: center;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .status-panel.state-connected {
-  background: var(--color-connected-bg);
-  border-color: var(--color-connected);
+  border-color: rgba(52, 226, 157, 0.5);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight), 0 0 48px rgba(52, 226, 157, 0.18);
 }
 
 .status-panel.state-connecting {
-  background: var(--color-connecting-bg);
-  border-color: var(--color-connecting);
+  border-color: rgba(255, 201, 92, 0.5);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight), 0 0 48px rgba(255, 201, 92, 0.16);
 }
 
 .status-panel.state-error {
-  background: var(--color-error-bg);
-  border-color: var(--color-error);
+  border-color: rgba(255, 107, 111, 0.5);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight), 0 0 48px rgba(255, 107, 111, 0.16);
 }
 
 .status-panel.state-idle {
-  background: var(--color-idle-bg);
-  border-color: var(--color-idle);
+  border-color: var(--glass-border);
 }
 
 .status-label {
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   font-weight: 700;
   margin-bottom: 6px;
 }
@@ -323,33 +490,158 @@ button:disabled {
 .status-server-name {
   font-size: 15px;
   color: var(--color-text-muted);
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+}
+
+/* ---------- Connecting spinner: a small rotating wireframe globe with
+   radar-style pulse rings, shown only while state-connecting is active
+   on the ancestor .status-panel. Pure CSS -- no JS wiring needed since
+   this just keys off the class the polling logic already sets. ---------- */
+
+.connecting-spinner {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 4px auto 0;
+  opacity: 0;
+  transform: scale(0.7);
+  max-height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, margin 0.4s ease;
+}
+
+.status-panel.state-connecting .connecting-spinner {
+  opacity: 1;
+  transform: scale(1);
+  max-height: 110px;
+  margin: 4px auto 26px;
+}
+
+.spinner-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-connecting);
+  opacity: 0;
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+
+.spinner-pulse-ring-2 {
+  animation-delay: 1.1s;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.62);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+.globe {
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 30%,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 201, 92, 0.18) 45%,
+    rgba(255, 201, 92, 0.42) 100%
+  );
+  box-shadow:
+    inset -10px -10px 18px rgba(0, 0, 0, 0.4),
+    inset 6px 6px 12px rgba(255, 255, 255, 0.25),
+    0 0 26px rgba(255, 201, 92, 0.45);
+  overflow: hidden;
+  perspective: 240px;
+}
+
+.globe-meridian {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  animation: spin-globe 3.2s linear infinite;
+}
+
+.globe-meridian-2 {
+  animation-delay: -1.07s;
+}
+
+.globe-meridian-3 {
+  animation-delay: -2.13s;
+}
+
+.globe-equator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 0;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+@keyframes spin-globe {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner-pulse-ring,
+  .globe-meridian {
+    animation: none !important;
+  }
 }
 
 .overlay-ip-block {
   margin: 12px 0 8px;
+  /* Plays once whenever the element goes from [hidden] to shown (a CSS
+     `animation` -- unlike `transition` -- fires on that display:none ->
+     rendered flip). A soft spring/overshoot instead of an instant snap,
+     for the hand-off from the connecting spinner. */
+  animation: ip-pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes ip-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .overlay-ip {
-  font-family: "Cascadia Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
-  font-size: 36px;
+  font-family: "Cascadia Mono", "SF Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
+  font-size: 40px;
   font-weight: 700;
   letter-spacing: 1px;
   color: var(--color-text);
   word-break: break-all;
+  text-shadow: 0 0 30px rgba(52, 226, 157, 0.35);
 }
 
 .overlay-ip-label {
   font-size: 13px;
   color: var(--color-text-muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .copy-row {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .error-message {
@@ -362,27 +654,31 @@ button:disabled {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 /* ---------- Dialog / add-server modal ---------- */
 
 dialog {
-  background: var(--color-surface-raised);
+  background: rgba(28, 32, 41, 0.75);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
-  padding: 20px;
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+  padding: 22px;
   width: min(420px, 90vw);
 }
 
 dialog::backdrop {
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
 }
 
 .dialog-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   margin: 0 0 12px;
 }
 
@@ -390,7 +686,7 @@ dialog::backdrop {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 textarea,
@@ -399,18 +695,19 @@ input[type="number"],
 select {
   font-family: inherit;
   font-size: 14px;
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
+  padding: 9px 12px;
   width: 100%;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 textarea {
   min-height: 90px;
   resize: vertical;
-  font-family: "Cascadia Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
+  font-family: "Cascadia Mono", "SF Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
 }
 
 textarea:focus,
@@ -418,6 +715,7 @@ input:focus,
 select:focus {
   outline: none;
   border-color: var(--color-accent);
+  background: rgba(109, 140, 255, 0.08);
 }
 
 label {
@@ -439,14 +737,17 @@ label {
 
 .advanced-note {
   font-size: 13px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: 12px 14px;
 }
 
 details.advanced-fields {
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   margin: 8px 0 4px;
@@ -470,7 +771,7 @@ details.advanced-fields summary {
 }
 
 .readonly-code {
-  font-family: "Cascadia Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
+  font-family: "Cascadia Mono", "SF Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
   font-size: 13px;
 }
 
@@ -488,6 +789,8 @@ details.advanced-fields summary {
 /* ---------- Footer ---------- */
 
 .app-footer {
+  position: relative;
+  z-index: 1;
   padding: 12px 20px 20px;
   text-align: center;
 }
@@ -507,13 +810,16 @@ details.advanced-fields summary {
 
 .setup-banner {
   position: fixed;
+  z-index: 2;
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-surface-raised);
+  background: rgba(28, 32, 41, 0.8);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   border-top: 1px solid var(--color-accent);
-  padding: 14px 20px;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 -8px 30px rgba(0, 0, 0, 0.4);
+  padding: 16px 20px;
 }
 
 .setup-banner p {
@@ -537,16 +843,16 @@ details.advanced-fields summary {
 }
 
 /* Brief attention pulse for the setup banner when it's re-triggered while
-   already visible -- subtle box-shadow flash, not a game-UI animation. */
+   already visible -- subtle glow flash, not a game-UI animation. */
 @keyframes attention-pulse {
   0% {
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 -8px 30px rgba(0, 0, 0, 0.4);
   }
   30% {
-    box-shadow: 0 0 0 3px var(--color-accent), 0 -4px 16px rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 0 0 3px var(--color-accent), 0 -8px 30px rgba(0, 0, 0, 0.4);
   }
   100% {
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 -8px 30px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -557,7 +863,9 @@ details.advanced-fields summary {
 /* ---------- Utility ---------- */
 
 .error-banner {
-  background: var(--color-error-bg);
+  background: rgba(255, 107, 111, 0.12);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   border: 1px solid var(--color-error);
   color: var(--color-error);
   border-radius: var(--radius-sm);

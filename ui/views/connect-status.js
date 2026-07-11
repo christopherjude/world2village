@@ -41,6 +41,17 @@ export function mount(root, params) {
       <div id="status-label" class="status-label">Connecting</div>
       <div id="status-nickname" class="status-server-name"></div>
 
+      <div class="connecting-spinner" aria-hidden="true">
+        <div class="spinner-pulse-ring"></div>
+        <div class="spinner-pulse-ring spinner-pulse-ring-2"></div>
+        <div class="globe">
+          <div class="globe-meridian"></div>
+          <div class="globe-meridian globe-meridian-2"></div>
+          <div class="globe-meridian globe-meridian-3"></div>
+          <div class="globe-equator"></div>
+        </div>
+      </div>
+
       <div id="overlay-ip-block" class="overlay-ip-block" hidden>
         <div class="overlay-ip-label">Your community IP is</div>
         <div id="overlay-ip-value" class="overlay-ip" tabindex="0"></div>
