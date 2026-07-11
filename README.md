@@ -28,14 +28,13 @@ Grab the latest installer from the **[Releases page](https://github.com/christop
 
 A frosted-glass, dark-themed interface: a list of saved servers, a big color-coded connection state, and — once connected — your overlay IP shown large and copyable, ready to paste into your game's LAN IP field.
 
-<table>
-<tr>
-<td align="center" width="25%"><img src="docs/screenshot-server-list.png" alt="Server list, empty state"><br><sub>Your servers</sub></td>
-<td align="center" width="25%"><img src="docs/screenshot-add-server.png" alt="Adding a server via invite code"><br><sub>Add via invite code</sub></td>
-<td align="center" width="25%"><img src="docs/screenshot-connecting.png" alt="Connecting state, with the rotating globe spinner"><br><sub>Connecting…</sub></td>
-<td align="center" width="25%"><img src="docs/screenshot-connected.png" alt="Connected state, showing the overlay IP"><br><sub>Connected</sub></td>
-</tr>
-</table>
+<p align="center">
+  <img src="docs/screenshot-server-list.png" width="200" alt="Server list, empty state">
+  <img src="docs/screenshot-add-server.png" width="200" alt="Adding a server via invite code">
+  <img src="docs/screenshot-connecting.png" width="200" alt="Connecting state, with the rotating globe spinner">
+  <img src="docs/screenshot-connected.png" width="200" alt="Connected state, showing the overlay IP">
+</p>
+<p align="center"><sub><b>Your servers</b> &nbsp;·&nbsp; <b>Add via invite code</b> &nbsp;·&nbsp; <b>Connecting…</b> &nbsp;·&nbsp; <b>Connected</b></sub></p>
 
 ## How to use it
 
