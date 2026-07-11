@@ -10,6 +10,13 @@ node_modules/
 dist/
 .vite/
 
+# Externally-supplied binaries (see bin/README.md) — not vendored/redistributed
+bin/*.exe
+bin/*.dll
+# tap-windows6 driver files (devcon.exe, OemVista.inf, tap0901.cat, tap0901.sys)
+# — the whole subdirectory is externally-supplied, same reasoning as edge.exe
+bin/tap-driver/
+
 # Editor/OS
 .vscode/
 .idea/

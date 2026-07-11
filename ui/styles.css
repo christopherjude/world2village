@@ -1,0 +1,556 @@
+/* Village -- simple, modern, non-Win32-dialog look. Single stylesheet,
+   no framework. See CLAUDE.md's product decisions for the "why" behind
+   the big connection state, large copyable IP, and de-emphasized
+   Advanced/host screen. */
+
+:root {
+  --color-bg: #14171c;
+  --color-surface: #1c2027;
+  --color-surface-raised: #232833;
+  --color-border: #2c313c;
+  --color-text: #e8eaed;
+  --color-text-muted: #9aa2b1;
+  --color-text-faint: #6b7280;
+  --color-accent: #4f8cff;
+  --color-accent-hover: #6ba0ff;
+
+  --color-connected: #2fbf71;
+  --color-connected-bg: rgba(47, 191, 113, 0.12);
+  --color-connecting: #e0a72f;
+  --color-connecting-bg: rgba(224, 167, 47, 0.12);
+  --color-error: #e5484d;
+  --color-error-bg: rgba(229, 72, 77, 0.12);
+  --color-idle: #6b7280;
+  --color-idle-bg: rgba(107, 114, 128, 0.12);
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+}
+
+.brand-mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  display: inline-block;
+}
+
+/* ---------- Main / view root ---------- */
+
+main#view-root {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.view[hidden] {
+  display: none;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+h2 {
+  font-size: 15px;
+  margin: 0 0 8px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+p {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ---------- Buttons ---------- */
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  padding: 8px 14px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary-button {
+  background: var(--color-accent);
+  color: #0b0e13;
+  font-weight: 600;
+  border: none;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.secondary-button {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.danger-button {
+  background: transparent;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.danger-button:hover:not(:disabled) {
+  background: var(--color-error-bg);
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  padding: 4px 8px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.icon-button:hover:not(:disabled) {
+  color: var(--color-error);
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  padding: 0;
+  font-size: 13px;
+}
+
+.link-button:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* ---------- Server list ---------- */
+
+.server-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.server-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.server-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-idle);
+  flex-shrink: 0;
+}
+
+.status-dot.is-connected {
+  background: var(--color-connected);
+  box-shadow: 0 0 0 3px var(--color-connected-bg);
+}
+
+.status-dot.is-connecting {
+  background: var(--color-connecting);
+  box-shadow: 0 0 0 3px var(--color-connecting-bg);
+}
+
+.server-nickname {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.server-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--color-text-faint);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+}
+
+/* ---------- Connection status view ---------- */
+
+.status-panel {
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.status-panel.state-connected {
+  background: var(--color-connected-bg);
+  border-color: var(--color-connected);
+}
+
+.status-panel.state-connecting {
+  background: var(--color-connecting-bg);
+  border-color: var(--color-connecting);
+}
+
+.status-panel.state-error {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+}
+
+.status-panel.state-idle {
+  background: var(--color-idle-bg);
+  border-color: var(--color-idle);
+}
+
+.status-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.state-connected .status-label {
+  color: var(--color-connected);
+}
+
+.state-connecting .status-label {
+  color: var(--color-connecting);
+}
+
+.state-error .status-label {
+  color: var(--color-error);
+}
+
+.state-idle .status-label {
+  color: var(--color-idle);
+}
+
+.status-server-name {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  margin-bottom: 18px;
+}
+
+.overlay-ip-block {
+  margin: 12px 0 8px;
+}
+
+.overlay-ip {
+  font-family: "Cascadia Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
+.overlay-ip-hint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.copy-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+.status-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ---------- Dialog / add-server modal ---------- */
+
+dialog {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  width: min(420px, 90vw);
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.dialog-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+textarea,
+input[type="text"],
+input[type="number"],
+select {
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  width: 100%;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+  font-family: "Cascadia Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.field {
+  margin-bottom: 12px;
+}
+
+/* ---------- Advanced/host view ---------- */
+
+.advanced-view {
+  max-width: 480px;
+}
+
+.advanced-note {
+  font-size: 13px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+details.advanced-fields {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 8px 0 4px;
+}
+
+details.advanced-fields summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+  color: var(--color-text-muted);
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-field label {
+  margin-bottom: 0;
+}
+
+.readonly-code {
+  font-family: "Cascadia Mono", "Consolas", "SFMono-Regular", Menlo, monospace;
+  font-size: 13px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.result-block {
+  margin-top: 18px;
+}
+
+/* ---------- Footer ---------- */
+
+.app-footer {
+  padding: 12px 20px 20px;
+  text-align: center;
+}
+
+.subtle-link {
+  color: var(--color-text-faint);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.subtle-link:hover {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+/* ---------- Setup banner ---------- */
+
+.setup-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-surface-raised);
+  border-top: 1px solid var(--color-accent);
+  padding: 14px 20px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.setup-banner p {
+  margin: 0 0 10px;
+  color: var(--color-text);
+}
+
+.setup-banner-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.setup-banner-status {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.banner-error {
+  color: var(--color-error);
+}
+
+/* Brief attention pulse for the setup banner when it's re-triggered while
+   already visible -- subtle box-shadow flash, not a game-UI animation. */
+@keyframes attention-pulse {
+  0% {
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+  }
+  30% {
+    box-shadow: 0 0 0 3px var(--color-accent), 0 -4px 16px rgba(0, 0, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.attention-pulse {
+  animation: attention-pulse 0.6s ease-out;
+}
+
+/* ---------- Utility ---------- */
+
+.error-banner {
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+[hidden] {
+  display: none !important;
+}

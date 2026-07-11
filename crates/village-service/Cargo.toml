@@ -1,0 +1,34 @@
+[package]
+name = "village-service"
+version = "0.1.0"
+edition.workspace = true
+
+# Windows-only: this binary is the SYSTEM-elevated Windows Service that
+# owns the `edge.exe` child process (named pipe IPC, service control,
+# ACL/SDDL management). It cannot be built or run on any other OS -- see
+# CLAUDE.md and crates/village-service/src/main.rs for the security model.
+# `cargo check -p village-service` is expected to fail on a non-Windows
+# host; that is an environment limitation, not a defect.
+
+[[bin]]
+name = "village-service"
+path = "src/main.rs"
+
+[dependencies]
+village-core = { path = "../village-core" }
+village-ipc = { path = "../village-ipc" }
+serde_json = "1"
+windows-service = "0.8"
+
+[dependencies.windows-sys]
+version = "0.61"
+features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+    "Win32_System_JobObjects",
+    "Win32_System_Pipes",
+    "Win32_System_Threading",
+]

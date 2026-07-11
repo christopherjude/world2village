@@ -11,7 +11,7 @@ A friendly Windows GUI wrapper around [n2n](https://github.com/ntop/n2n)'s `edge
 
 - **Rust + Tauri** for the app shell — small binary, native subprocess/service management from Rust, HTML/CSS/JS frontend so the UI doesn't look like a Win32 dialog.
 - **Windows-only** target for v1 (matches the gaming use case — Generals is Windows-only anyway).
-- **WinTun** driver (not the legacy tap-windows6/NDIS5/6 driver n2n normally bundles) — one universal driver, no per-arch/per-OS-version installer matrix, far fewer "adapter didn't show up" failure modes.
+- **tap-windows6** driver (OpenVPN's, from https://github.com/OpenVPN/tap-windows6 — n2n's own docs point here). **WinTun was considered and rejected — see gotcha below, do not revisit without re-reading it.**
 - License: MIT.
 
 ## Product decisions already made
@@ -27,7 +27,8 @@ A friendly Windows GUI wrapper around [n2n](https://github.com/ntop/n2n)'s `edge
 - **The supernode needs an IP pool.** `supernode.exe` must be started with `-a <subnet>/<cidr>` (e.g. `-a 10.100.0.0/24`) or it has nothing to hand out even when the edge asks correctly.
 - **Windows requires elevation to configure adapter IPs.** A plain unelevated `edge.exe` opens the TAP/WinTun device fine but silently fails to set its IP. Solve this architecturally — e.g. install as a Windows Service (SYSTEM-elevated) rather than asking users to "run as Administrator," which non-IT friends will get wrong or find confusing.
 - **Distinct MAC addresses matter.** Two edges connecting with identical/default MACs collide at the supernode ("authentication error, MAC or IP address already in use"). Village should generate/persist a stable per-install MAC (or rely on n2n's own generation) — never hardcode the same MAC across installs.
-- **The legacy driver install dance is real pain.** The old tap-windows6 driver needs `tapinstall.exe find/remove/install` per NDIS version (5 vs 6) and per arch (x86/x64/ARM/WinXP). This is exactly what WinTun avoids — prefer it.
+- **WinTun does NOT work with n2n — don't "fix" this again.** WinTun is a layer-3 (IP-only) adapter; n2n is a layer-2 (Ethernet) system. Straight from the n2n maintainers (github.com/ntop/n2n#1086): "WinTun provides a layer-3 virtual network card, however N2N is a layer-2 system... nobody has [written a layer-2 emulation]." There is zero WinTun code anywhere in upstream n2n. This also matters functionally, not just technically: old RTS LAN discovery (Generals included) typically depends on Ethernet-level broadcast, which a layer-3-only adapter can't carry. Village must use the real tap-windows6 driver.
+- **The tap-windows6 install dance is real, and Village automates it — the user never sees it.** The driver (`OemVista.inf` + `tap0901.cat` + `tap0901.sys` + `devcon.exe`, per-arch, from OpenVPN's tap-windows6 releases) is installed with `devcon.exe install OemVista.inf tap0901` (hardware ID `tap0901`). This runs once, elevated, as part of the same one-time Windows Service install/setup step — bundled alongside `edge.exe` in `bin/`, copied to `%ProgramData%\Village\bin\` at install time, invoked by `village-service`'s installer. One UAC prompt covers both the service registration and the driver install; nothing after that requires elevation or user driver-hunting.
 
 ## Reference material this project was informed by
 
@@ -50,4 +51,12 @@ Default flow for a feature: `village-coder` implements → `village-builder` ver
 
 ## Status
 
-Scaffolding only. No Cargo/Tauri project has been initialized yet — that's the first task for `village-coder` in the next session (`cargo install tauri-cli` if needed, `cargo tauri init`, pick a frontend approach).
+v1 builds end-to-end and produces real installers (`dist/Village_0.1.0_x64_en-US.msi`, `dist/Village_0.1.0_x64-setup.exe`), verified with a real `cargo tauri build` on a Windows host (not just `cargo check` — this repo lives in WSL2, so builds are done by copying to a native Windows path, e.g. `C:\dev\world2village`, and running cargo/tauri-cli there; `powershell.exe` is reachable directly from WSL bash for this).
+
+Client-only in scope: Village never launches `supernode.exe` — supernodes are hosted separately, out-of-band. The app manages a list of saved "Server" profiles (nickname + community + key + supernode host:port), not a single paste-and-connect flow. Invite codes export/import one profile; a hidden Advanced screen lets the host type raw fields and generate codes for friends.
+
+Still pending, not yet done:
+- Click-testing the actual GUI on Windows (build success confirmed; UX flow not yet exercised end-to-end by a human).
+- Verifying `edge.exe`'s real stdout format matches `village-service`'s IP-parsing guess (written defensively, but unverified against real output).
+- A `village-security` pass over the driver-install/subprocess/IPC code (several rounds of it were explicitly skipped this session to prioritize getting a working build).
+- Pinning exact `edge.exe` version/hash in `bin/README.md` (currently records whatever build was on hand, not a specific upstream release tag).

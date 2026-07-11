@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Village</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Village</span>
+      </div>
+      <button id="nav-back" class="link-button" type="button" hidden>&larr; Back to servers</button>
+    </header>
+
+    <main id="view-root">
+      <!-- Views are rendered into here by app.js -->
+    </main>
+
+    <footer class="app-footer">
+      <a id="advanced-link" href="#advanced-host" class="subtle-link">Advanced: create an invite code</a>
+    </footer>
+
+    <!-- Setup banner: shown when the Village service isn't installed yet. -->
+    <div id="setup-banner" class="setup-banner" hidden>
+      <p>
+        Village needs a one-time setup step to run in the background.
+        You'll see a single Windows security prompt.
+      </p>
+      <div class="setup-banner-actions">
+        <button id="setup-banner-run" type="button" class="primary-button">Set up Village</button>
+        <button id="setup-banner-dismiss" type="button" class="link-button">Dismiss</button>
+      </div>
+      <p id="setup-banner-status" class="setup-banner-status" hidden></p>
+    </div>
+
+    <script type="module" src="api.js"></script>
+    <script type="module" src="views/server-list.js"></script>
+    <script type="module" src="views/connect-status.js"></script>
+    <script type="module" src="views/advanced-host.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

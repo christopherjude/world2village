@@ -1,0 +1,24 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/village-core",
+    "crates/village-ipc",
+    "crates/village-service",
+    "src-tauri",
+]
+# Only the portable, pure-Rust crates are built by a plain `cargo build`/`cargo test`
+# at the workspace root. `crates/village-service` and `src-tauri` are Windows/GTK-only.
+# Both are `members` entries (so `cargo check -p <name>` and `cargo metadata` can see
+# them) but deliberately NOT `default-members` entries, so they must be built
+# explicitly with `-p village-service`/`-p village-tauri` on a machine that has an
+# actual Windows (and, for `village-tauri`, GTK/webkit2gtk) toolchain -- both are
+# expected to fail to compile on this Linux sandbox (see crates/village-service/
+# Cargo.toml's and src-tauri/Cargo.toml's top comments), which is an environment
+# limitation, not a defect.
+default-members = [
+    "crates/village-core",
+    "crates/village-ipc",
+]
+
+[workspace.package]
+edition = "2021"
