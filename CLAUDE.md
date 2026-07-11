@@ -19,7 +19,7 @@ A friendly Windows GUI wrapper around [n2n](https://github.com/ntop/n2n)'s `edge
 - **Invite code, not raw fields.** Users never see community/key/supernode host:port as separate inputs. One code/link encodes all three; pasting it is the entire "join" flow.
 - **Never expose `-a` mode picking to the user.** Always let the supernode assign the IP (see gotcha below) unless a future power-user "advanced" mode explicitly asks for a static IP.
 - **Advanced settings are collapsed by default.** MTU, compression, header encryption, custom params — hidden unless a user opts into "Advanced."
-- **Big, obvious connection state** + the assigned overlay IP shown large and copyable, with a one-line hint ("paste this into Generals' LAN IP field").
+- **Big, obvious connection state** + the assigned overlay IP shown large and copyable, with a one-line hint ("Your community IP is").
 
 ## Hard-won gotchas — do not relearn these the hard way
 

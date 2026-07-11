@@ -153,6 +153,22 @@ function renderList(servers, status) {
     main.appendChild(dot);
     main.appendChild(name);
 
+    if (isActiveServer) {
+      main.classList.add("clickable");
+      main.setAttribute("role", "button");
+      main.setAttribute("tabindex", "0");
+      main.setAttribute("aria-label", `View connection status for ${server.nickname}`);
+      main.addEventListener("click", () => {
+        showView("connect-status", { id: server.id, nickname: server.nickname });
+      });
+      main.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          showView("connect-status", { id: server.id, nickname: server.nickname });
+        }
+      });
+    }
+
     const actions = document.createElement("div");
     actions.className = "server-row-actions";
 

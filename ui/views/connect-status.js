@@ -1,7 +1,7 @@
 // Connection status view: big, obvious connection state, and once
 // `ConnectionStatusView` reports `Connected`, the overlay IP shown large,
-// monospace, copyable, with the "paste this into Generals' LAN IP field"
-// hint (see CLAUDE.md's product decisions). Polls `get_status` every ~1.5s
+// monospace, copyable, with a "Your community IP is" lead-in label
+// (see CLAUDE.md's product decisions). Polls `get_status` every ~1.5s
 // while this view is active (per the polling-cadence note on the Rust
 // `get_status` command) and stops polling once the view is left.
 
@@ -42,8 +42,8 @@ export function mount(root, params) {
       <div id="status-nickname" class="status-server-name"></div>
 
       <div id="overlay-ip-block" class="overlay-ip-block" hidden>
+        <div class="overlay-ip-label">Your community IP is</div>
         <div id="overlay-ip-value" class="overlay-ip" tabindex="0"></div>
-        <div class="overlay-ip-hint">Paste this into Generals' LAN IP field.</div>
         <div class="copy-row">
           <button id="copy-ip-button" type="button" class="secondary-button">Copy</button>
         </div>

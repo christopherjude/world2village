@@ -237,6 +237,20 @@ button:disabled {
   white-space: nowrap;
 }
 
+.server-row-main.clickable {
+  cursor: pointer;
+}
+
+.server-row-main.clickable:hover {
+  color: var(--color-accent-hover);
+}
+
+.server-row-main.clickable:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 .server-row-actions {
   display: flex;
   align-items: center;
@@ -325,10 +339,10 @@ button:disabled {
   word-break: break-all;
 }
 
-.overlay-ip-hint {
+.overlay-ip-label {
   font-size: 13px;
   color: var(--color-text-muted);
-  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .copy-row {
